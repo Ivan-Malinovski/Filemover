@@ -10,9 +10,9 @@ def start():
 
     print('Set work directory to ' + workdir)
     foldername = input('Name for new folder: ')
-    usersearch = input('Word in file name: ').lower()
-    search = re.compile(usersearch)
-    wish = input('[c]opy or [m]ove? (copies if nothing is selected) ').lower()
+    usersearch = input('Word in file name: ')
+    search = re.compile(usersearch, re.I)
+    wish = input('[c]opy or [m]ove? (copies by default) ').lower()
 
     print('\nLooking for files that contain ' + usersearch + '...\n')
 
