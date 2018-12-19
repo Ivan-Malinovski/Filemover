@@ -42,7 +42,7 @@ def movefiles(foldername, showfiles, wish):
             if wish == 'move' or wish == 'm':
                 if count == 0:
                     print('Moving following files to ' + foldername + ':')
-                shutil.copy(filename, foldername)  # copy found file to new folder
+                shutil.move(filename, foldername)  # copy found file to new folder
                 count += 1
                 print(filename)
 
