@@ -1,38 +1,61 @@
 import os
 import shutil
+import re
 
-def movefile():
-    # TODO - option to list files
-    print('\nFilemover automatically moves or copies all files and folders that contain your search word. By default it uses its own directory.\n')
+def start():
+    print('\nFilemover moves or copies all files and folders that contain your search word.\n')
 
+    workdir = input('Choose work directory: ')
+    os.chdir(workdir)
+
+    print('Set work directory to ' + workdir)
     foldername = input('Name for new folder: ')
-    search = input('Word in file name: ').lower()
-    wish = input('[c]opy or [m]ove? ').lower()
-    os.mkdir(foldername) # os.mkdir creates directory
-    print('\nCreated folder ' + foldername + ', looking for files that contain ' + search + '...\n')
+    usersearch = input('Word in file name: ').lower()
+    search = re.compile(usersearch)
+    wish = input('[c]opy or [m]ove? (copies if nothing is selected) ').lower()
 
-    count = len(os.listdir())-1 # counts how many files are in current directory
-    found = 0
-    while 0 < count: # loops as many times as there are files in current directory
-        filename = os.listdir()[count] # finds filename
+    print('\nLooking for files that contain ' + usersearch + '...\n')
 
-        if search in os.listdir()[count].lower(): # if users search word is anywhere in the filename ...
-            if wish == 'move' or wish == 'm':
-                shutil.move(filename, foldername) # move found file to
-                print('moving ' + filename + ' to ' + foldername)
-            elif wish == 'copy' or wish == 'c':
-                shutil.copy(filename, foldername)  # kopier filen til brugerens nye mappe
-                print('copying ' + filename + ' to ' + foldername)
+    showfiles = list(filter(search.search, os.listdir())) # list with found files
 
-            found = 1
-            count = count - 1
+    listfiles(showfiles, foldername)
+    movefiles(foldername, showfiles, wish)
+
+def listfiles(showfiles, foldername):
+    if len(showfiles) == 0:
+        end = input('Couldn\'t find any files containing your searchphrase.\nPress enter to exit, press any key to retry')
+        if end == '':
+            exit()
         else:
-            count = count - 1
-    if found == 0: 
-        print('No files found, deleting folder')
-        os.rmdir(foldername) # delete user folder
+            start()
     else:
-        print('\nCompleted. Moved or copied ' + str(found+1) + ' file(s).')
-    end = input('\nYou can now close the window')
+        print('Files found, creating folder ' + foldername + '\nFound the following ' + str(len(showfiles)) + ' file(s):')
+        print(*showfiles, sep = '\n')
+        cont = input('\nPress enter to continue or close window to cancel\n')
+        os.mkdir(foldername)  # os.mkdir creates director
 
-movefile()
+def movefiles(foldername, showfiles, wish):
+        count = 0
+        while count < len(showfiles):
+            filename = showfiles[count]
+
+            if wish == 'move' or wish == 'm':
+                if count == 0:
+                    print('Moving following files to ' + foldername + ':')
+                shutil.copy(filename, foldername)  # copy found file to new folder
+                count += 1
+                print(filename)
+
+            else:
+                if count == 0:
+                    print('Copying following files to ' + foldername + ':')
+                shutil.copy(filename, foldername)  # copy found file to new folder
+                count += 1
+                print(filename)
+        if wish == 'move' or wish == 'm':
+            print('\nCompleted. Moved ' + str(count) + ' file(s).')
+        else:
+            print('\nCompleted. Copied ' + str(count) + ' file(s).')
+        end = input('\nYou can now close the window')
+
+start()
