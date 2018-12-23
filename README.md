@@ -16,4 +16,5 @@ The Romeo and Juliet files are just meant for testing.
 
 
 Current limitations (and things to be fixed):
-It's not good at handling errors. For example, if a program like uTorrent locks a file, Filemover will just quit. This is also why Filemover defaults to copying, if no option is chosen.
+It's not good at handling errors. ~~For example, if a program like uTorrent locks a file, Filemover will just quit. This is also why Filemover defaults to copying, if no option is chosen~~. It's still not good at error handling, but now it's less bad.
+It should probably check for possible errors before moving anything.
