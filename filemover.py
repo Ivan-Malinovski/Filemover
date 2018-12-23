@@ -1,6 +1,7 @@
 import os
 import shutil
 import re
+import traceback
 
 def start():
     print('\nFilemover moves or copies all files and folders that contain your search word.\n')
@@ -12,7 +13,7 @@ def start():
     print('Set work directory to ' + workdir)
 
     foldername = input('Name for new folder: ')
-    usersearch = input('Word in file name: ')
+    usersearch = input('Word in file name (if blank, it lists everything): ')
     search = re.compile(usersearch, re.I) # converts to regex, ignores case
     wish = input('[c]opy or [m]ove? (copies by default) ').lower()
 
@@ -37,10 +38,10 @@ def listfiles(showfiles, foldername):
         os.mkdir(foldername)  # os.mkdir creates directory
 
 def movefiles(foldername, showfiles, wish):
-        count = 0
-        while count < len(showfiles): # loop that moves files.
-            filename = showfiles[count]
-
+    count = 0
+    while count < len(showfiles): # loop that moves files.
+        filename = showfiles[count]
+        try:
             if wish == 'move' or wish == 'm':
                 if count == 0:
                     print('Moving following files to ' + foldername + ':')
@@ -54,11 +55,21 @@ def movefiles(foldername, showfiles, wish):
                 shutil.copy(filename, foldername)  # copy found file to new folder
                 count += 1
                 print(filename)
-        if wish == 'move' or wish == 'm':
-            print('\nCompleted. Moved ' + str(count) + ' file(s).')
-        else:
-            print('\nCompleted. Copied ' + str(count) + ' file(s).')
-        end = input('\nClose window to exit or \'enter\' to restart Filemover')
-        start()
+        except PermissionError:
+            end = input('An error has occurred: A file is being used by another process. Type \'error\' to see the full error message. \nSome files might still have been or moved. Press enter to restart.')
+            if end.lower() == 'error':
+                print(traceback.format_exc())
+            start()
+        except:
+            print('An error has occurred: ' + traceback.format_exc())
+            input('Press enter to try again')
+            start()
+
+    if wish == 'move' or wish == 'm':
+        print('\nCompleted. Moved ' + str(count) + ' file(s).')
+    else:
+        print('\nCompleted. Copied ' + str(count) + ' file(s).')
+    end = input('\nClose window to exit or \'enter\' to restart Filemover')
+    start()
 
 start()
