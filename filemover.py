@@ -33,33 +33,36 @@ def listfiles(showfiles, foldername):
             start()
     else:
         print('Files found, creating folder ' + foldername + '\nFound the following ' + str(len(showfiles)) + ' file(s):')
-        print(*showfiles, sep = '\n') # shows list of files, but separated
+        print(*showfiles, sep = '\n') # shows list of files, but separated by linebreak
         cont = input('\nPress enter to accept and continue or close window to cancel\n')
         os.mkdir(foldername)  # os.mkdir creates directory
 
 def movefiles(foldername, showfiles, wish):
     count = 0
-    while count < len(showfiles): # loop that moves files.
-        filename = showfiles[count]
-        try:
-            if wish == 'move' or wish == 'm':
-                if count == 0:
-                    print('Moving following files to ' + foldername + ':')
-                shutil.move(filename, foldername)  # copy found file to new folder
-                count += 1
-                print(filename)
 
-            else:
-                if count == 0:
-                    print('Copying following files to ' + foldername + ':')
-                shutil.copy(filename, foldername)  # copy found file to new folder
-                count += 1
-                print(filename)
+    if wish == 'move' or wish == 'm':
+        fn  = shutil.move
+        action = 'Moving'
+    else:
+        fn = shutil.copy
+        action = 'Copying'
+
+    while count < len(showfiles): # loop that moves files
+        filename = showfiles[count]
+
+        try:
+            if count == 0:
+                print(action + ' following files to ' + foldername + ':')
+            fn(filename, foldername)  # copy found file to new folder
+            count += 1
+            print(filename)
+
         except PermissionError:
             end = input('An error has occurred: A file is being used by another process. Type \'error\' to see the full error message. \nSome files might still have been or moved. Press enter to restart.')
             if end.lower() == 'error':
                 print(traceback.format_exc())
             start()
+
         except:
             print('An error has occurred: ' + traceback.format_exc())
             input('Press enter to try again')
@@ -67,9 +70,10 @@ def movefiles(foldername, showfiles, wish):
 
     if wish == 'move' or wish == 'm':
         print('\nCompleted. Moved ' + str(count) + ' file(s).')
+
     else:
         print('\nCompleted. Copied ' + str(count) + ' file(s).')
-    end = input('\nClose window to exit or \'enter\' to restart Filemover')
+    end = input('\nClose window to exit or press enter to restart Filemover')
     start()
 
 start()
